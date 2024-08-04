@@ -31,14 +31,66 @@ fetchdata().then((data) => {
 
 function displayWorks(works) {
   const gallery = document.querySelector(".gallery");
+  const modalGallery = document.querySelector(".modale-gallery");
   gallery.innerHTML = "";
+  modalGallery.innerHTML = "";
   works.forEach((work) => {
+    /// Gallery
     const figure = document.createElement("figure");
     figure.innerHTML = `
       <img src="${work.imageUrl}" alt="${work.title}" />
       <figcaption>${work.title}</figcaption>
     `;
     gallery.appendChild(figure);
+
+    // Modale Gallery
+    const modalFigure = document.createElement("figure");
+    const deleteLink = document.createElement("a");
+    deleteLink.className = "modale-icon icon-delete";
+    deleteLink.href = "#";
+    deleteLink.innerHTML = `<img src="./assets/icons/Trash.png" srcset="./assets/icons/Trash@2x.png 2x" alt="Delete">`;
+    deleteLink.addEventListener("click", async function (event) {
+      event.preventDefault();
+      const response = await fetch(
+        `http://localhost:5678/api/works/${work.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("authToken"),
+            accept: "application/json",
+          },
+        }
+      );
+      // Handle response if needed
+
+      if (response.ok) {
+        console.log("delete ok");
+        displayWorks(works);
+      } else {
+        console.log("delete ko");
+        console.log(response);
+      }
+    });
+
+    // Append elements directly
+    modalFigure.appendChild(deleteLink);
+    // Append deleteLink and other elements to modalFigure
+    modalFigure.appendChild(deleteLink);
+    const imgElement = document.createElement("img");
+    imgElement.src = work.imageUrl;
+    imgElement.alt = work.title;
+    modalFigure.appendChild(imgElement);
+
+    const figcaption = document.createElement("figcaption");
+    const editLink = document.createElement("a");
+    editLink.href = "#";
+    editLink.textContent = "éditer";
+    figcaption.appendChild(editLink);
+    modalFigure.appendChild(figcaption);
+
+    // Add event listener after appending
+
+    modalGallery.appendChild(modalFigure);
   });
 }
 
@@ -51,6 +103,10 @@ function displayCategories(categories, works) {
   allButton.addEventListener("click", () => displayWorks(works));
 
   categoryButtons.appendChild(allButton);
+
+  const formSelectCategory = document.getElementById("category");
+  formSelectCategory.innerHTML = "<option></option>";
+
   categories.forEach((category) => {
     const myButton = document.createElement("myButton");
     myButton.innerHTML = `
@@ -61,6 +117,12 @@ function displayCategories(categories, works) {
       displayWorks(works.filter((work) => work.categoryId == category.id))
     );
     categoryButtons.appendChild(myButton);
+
+    // Image Form Categories
+
+    formSelectCategory.innerHTML += `
+      <option value="${category.id}">${category.name}</option>
+    `;
   });
 }
 
@@ -94,30 +156,44 @@ document.addEventListener("DOMContentLoaded", (event) => {
     document.querySelector(".modale-main").classList.add("hidden");
   });
 
+  let file = null;
+
   document
     .getElementById("image")
     .addEventListener("change", async function (event) {
-      const file = event.target.files[0]; // Obtenir le premier fichier sélectionné
+      file = event.target.files[0]; // Obtenir le premier fichier sélectionné
+      document.querySelector(".image-unselected").classList.add("hidden");
+      document.querySelector(".image-selected").src = URL.createObjectURL(file);
+      document.querySelector(".image-selected").classList.remove("hidden");
+    });
+
+  document
+    .getElementById("addphoto-form")
+    .addEventListener("submit", async function (event) {
+      event.preventDefault();
+      // Obtenir le premier fichier sélectionné
 
       if (file) {
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("image", file);
+        formData.append("title", document.getElementById("title").value);
+        formData.append("category", document.getElementById("category").value);
         console.log("Bearer " + localStorage.getItem("authToken"));
         const response = await fetch("http://localhost:5678/api/works", {
           method: "POST",
           headers: {
             Authorization: "Bearer " + localStorage.getItem("authToken"),
+            accept: "application/json",
           },
           body: formData,
         });
 
         if (response.ok) {
           const storedImage = await response.json();
-          console.log("store ok");
-          document.querySelector(".image-selected").src = storedImage.imageUrl;
-          document.querySelector(".image-selected").classList.remove("hidden");
+          console.log("store ok", storedImage);
+          displayWorks(works);
         } else {
-          console.log("store ko");
+          console.log("store ko", file);
           console.log(response);
         }
       } else {
