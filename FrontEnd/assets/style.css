@@ -158,7 +158,12 @@ li:hover {
 }
 #portfolio h2 {
 	text-align: center;
-	margin-bottom: 1em;
+}
+.title-portfolio {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 50px;
 }
 .modify {
 	display: flex;
@@ -189,16 +194,16 @@ allbutton{
 }
 filterbutton {
 	border: 1px solid #1D6154;
-  border-radius: 50px;
-  padding: 9px 15px;
-  background-color: transparent;
-  font-family: "Syne", sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: #1D6154;
-  cursor: pointer;
+	border-radius: 50px;
+	padding: 9px 15px;
+	background-color: transparent;
+	font-family: "Syne", sans-serif;
+	font-size: 16px;
+	font-weight: 700;
+	color: #1D6154;
+	cursor: pointer;
 }
-button1, button2, button3{
+#filterButton1 {
 	color: #1D6154;
 }
 
@@ -271,7 +276,8 @@ footer nav ul {
 
 
 #login {
-	margin-bottom: 380px;
+	width: 380px;
+  	margin: auto;
 }
 
 #login h1 {
@@ -462,9 +468,6 @@ p {
 	border-top: 1px solid #B3B3B3;
 }
 
-.modale-modify a {
-	color: #D65353;
-}
 
 /* MODALE-ADDPHOTO */
 
@@ -581,9 +584,7 @@ a {
 	margin: 0 0 0 30px;
 }
 
-.title-portfolio .modify.hidden {
-	display: none;
-}
+
 .modale input, .modale select {
 	height: 50px;
 	font-size: 1.1em;
