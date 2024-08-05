@@ -1,35 +1,43 @@
-async function fetchdata() {
+async function fetchWorks() {
   try {
-    const [fetchWorks, ftechCategories] = await Promise.all([
-      fetch("http://localhost:5678/api/works"),
-      fetch("http://localhost:5678/api/categories"),
-    ]);
-    if (!fetchWorks.ok || !ftechCategories.ok) {
+    const fetchWorks = await fetch("http://localhost:5678/api/works");
+
+    if (!fetchWorks.ok) {
       throw new Error("il y a un soucis avec l'API");
     }
-    const [works, categories] = await Promise.all([
-      fetchWorks.json(),
-      ftechCategories.json(),
-    ]);
+    const works = await fetchWorks.json();
     console.log("affichage des données : ");
-    return { works, categories };
+    return works;
   } catch (error) {
     console.error("*", error.message);
     return null;
   }
 }
 
-fetchdata().then((data) => {
-  if (data) {
-    const { works, categories } = data;
-    console.log("works :", works);
-    console.log("categories:", categories);
-    displayWorks(works);
-    displayCategories(categories, works);
+async function fetchCategories() {
+  try {
+    const fetchCategories = await fetch("http://localhost:5678/api/categories");
+    if (!fetchCategories.ok) {
+      throw new Error("il y a un soucis avec l'API");
+    }
+    const categories = await fetchCategories.json();
+    console.log("affichage des données : ");
+    return categories;
+  } catch (error) {
+    console.error("*", error.message);
+    return null;
   }
-});
+}
 
-function displayWorks(works) {
+async function displayWorks() {
+  let works = null;
+  await fetchWorks().then((data) => {
+    if (data) {
+      works = data;
+      console.log("works :", works);
+    }
+  });
+
   const gallery = document.querySelector(".gallery");
   const modalGallery = document.querySelector(".modale-gallery");
   gallery.innerHTML = "";
@@ -51,25 +59,8 @@ function displayWorks(works) {
     deleteLink.innerHTML = `<img src="./assets/icons/Trash.png" srcset="./assets/icons/Trash@2x.png 2x" alt="Delete">`;
     deleteLink.addEventListener("click", async function (event) {
       event.preventDefault();
-      const response = await fetch(
-        `http://localhost:5678/api/works/${work.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("authToken"),
-            accept: "application/json",
-          },
-        }
-      );
-      // Handle response if needed
-
-      if (response.ok) {
-        console.log("delete ok");
-        displayWorks(works);
-      } else {
-        console.log("delete ko");
-        console.log(response);
-      }
+      // delete image function
+      deleteImage(work.id);
     });
 
     // Append elements directly
@@ -94,7 +85,17 @@ function displayWorks(works) {
   });
 }
 
-function displayCategories(categories, works) {
+displayWorks();
+displayCategories();
+async function displayCategories(works) {
+  let categories = null;
+  await fetchCategories().then((data) => {
+    if (data) {
+      categories = data;
+      console.log("categories:", categories);
+    }
+  });
+
   const categoryButtons = document.getElementById("filters");
   const allButton = document.createElement("allButton");
   allButton.innerHTML = `
@@ -191,7 +192,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         if (response.ok) {
           const storedImage = await response.json();
           console.log("store ok", storedImage);
-          displayWorks(works);
+          displayWorks();
         } else {
           console.log("store ko", file);
           console.log(response);
@@ -263,4 +264,25 @@ function displayWorksModale() {
 
     modaleGalleryElem.appendChild(figureElem);
   });
+}
+
+// Image delete function by id
+async function deleteImage(id) {
+  console.log("Deletion of the image");
+  const response = await fetch(`http://localhost:5678/api/works/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("authToken"),
+      accept: "application/json",
+    },
+  });
+  // Handle response if needed
+
+  if (response.ok) {
+    console.log("delete ok");
+    displayWorks();
+  } else {
+    console.log("delete ko");
+    console.log(response);
+  }
 }
