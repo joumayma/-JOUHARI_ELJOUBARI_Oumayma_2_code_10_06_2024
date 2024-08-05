@@ -108,15 +108,15 @@ function displayCategories(categories, works) {
   formSelectCategory.innerHTML = "<option></option>";
 
   categories.forEach((category) => {
-    const myButton = document.createElement("myButton");
-    myButton.innerHTML = `
-      <a href="#myButton${category.id}"><span id="button${category.id}">${category.name}</span></a>
+    const filterButton = document.createElement("filterButton");
+    filterButton.innerHTML = `
+      <a href="#filterButton${category.id}"><span id="button${category.id}">${category.name}</span></a>
     `;
 
-    myButton.addEventListener("click", () =>
+    filterButton.addEventListener("click", () =>
       displayWorks(works.filter((work) => work.categoryId == category.id))
     );
-    categoryButtons.appendChild(myButton);
+    categoryButtons.appendChild(filterButton);
 
     // Image Form Categories
 
