@@ -52,6 +52,7 @@ body {
 	margin:auto;
 	font-family: 'Work Sans' ;
 	font-size: 14px;
+	background-color: #FFFEF8;
 }
 header {
 	display: flex;
@@ -93,17 +94,21 @@ h2{
 	justify-content: center;
 	align-items: center;
 	gap: 20px; 
+	height: 50px;
 }
 
 .edit.hidden {
 	display: none;
 }
 
-.edit-mode {
+.edit-mode P {
 	display: flex;
 	align-items: flex-end;
 	gap: 10px;
 	color: white;
+}
+.edit-mode{
+	display: contents;
 }
 
 .edit-mode img {
