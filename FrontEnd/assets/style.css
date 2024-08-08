@@ -206,6 +206,9 @@ filterbutton {
 #filterButton1 {
 	color: #1D6154;
 }
+#button1, #button2, #button3 {
+	color: #1D6154;
+}
 
 
 
@@ -300,13 +303,15 @@ footer nav ul {
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 	padding: 0 16px;
+	display: flex;
 }
 .login-form label {
 	font-family: 'Work Sans';
-	font-weight: 600;
+	font-weight: 500;
 	font-size: 14px;
 	color: #3D3D3D;
 }
+
 
 #submit {
 	font-family: 'Syne';
@@ -321,11 +326,13 @@ footer nav ul {
 }
 p {
 	color: #3D3D3D;
-	margin: 37px auto 28px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	font-weight: 500;
 }
+	
+
 
 /* -------------------------------- MODALE -------------------------------- */
 
@@ -379,6 +386,9 @@ p {
 
 .back-button.hidden {
 	visibility: hidden;
+}
+.modale-modify .validate-button.disabled{ 
+	background-color: #A7A7A7;
 }
 
 .modale header a img {
@@ -543,6 +553,7 @@ p {
 
 .modale-modify .validate-button {
 	margin : 0;
+	width: 240px;
 }
 .modale button {
 	font-family: 'Syne', sans-serif;
@@ -550,7 +561,7 @@ p {
   color: white;
   background-color: #1D6154;
   margin: 2em auto;
-  width: 180px;
+  width: 200px;
   text-align: center;
   border-radius: 60px;
   cursor: pointer;
@@ -586,7 +597,7 @@ a {
 
 
 .modale input, .modale select {
-	height: 50px;
+	height: 40px;
 	font-size: 1.1em;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);

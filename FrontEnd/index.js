@@ -1,4 +1,22 @@
-let globalWorks = null;
+const authToken = localStorage.getItem("authToken");
+
+// login link
+const loginLink = document.getElementById("loginLink");
+loginLink.innerHTML = "";
+
+if (authToken) {
+  // remove token
+  const logoutLink = document.createElement("a");
+  logoutLink.href = "#";
+  logoutLink.text = "logout";
+  loginLink.append(logoutLink);
+  logoutLink.addEventListener("click", async function (event) {
+    event.preventDefault();
+    localStorage.removeItem("authToken");
+    location.reload();
+  });
+} else loginLink.innerHTML = '<a href="login.html">login</a>';
+
 // Function to fetch works
 async function fetchWorks() {
   try {
@@ -38,14 +56,14 @@ async function fetchCategories() {
 }
 
 // Function to display works
-async function displayWorks(works = null) {
-  works = null;
-
+async function displayWorks(categoryId) {
   // Fetch works data
   await fetchWorks().then((data) => {
     if (data) {
-      works = data;
-      globalWorks = data;
+      if (categoryId)
+        works = data.filter((work) => work.categoryId == categoryId);
+      else works = data;
+
       console.log("works :", works);
     }
   });
@@ -111,30 +129,32 @@ async function displayCategories(works) {
   });
 
   const categoryButtons = document.getElementById("filters");
-  const allButton = document.createElement("allButton");
-  allButton.innerHTML = `
-    <a href="#allButton"><span id="allButton">Tous</span></a>
-  `;
+  if (!authToken) {
+    const allButton = document.createElement("allButton");
+    allButton.innerHTML = `
+      <a href="#allButton"><span id="allButton">Tous</span></a>
+    `;
 
-  // Add event listener to "Tous" button
-  allButton.addEventListener("click", () => displayWorks());
-  categoryButtons.appendChild(allButton);
+    // Add event listener to "Tous" button
+    allButton.addEventListener("click", () => displayWorks());
+    categoryButtons.appendChild(allButton);
+  }
 
   const formSelectCategory = document.getElementById("category");
   formSelectCategory.innerHTML = "<option></option>";
 
   // Create category buttons and options
   categories.forEach((category) => {
-    const filterButton = document.createElement("filterButton");
-    filterButton.innerHTML = `
-      <a href="#filterButton${category.id}"><span id="button${category.id}">${category.name}</span></a>
-    `;
+    if (!authToken) {
+      const filterButton = document.createElement("filterButton");
+      filterButton.innerHTML = `
+        <a href="#filterButton${category.id}"><span id="button${category.id}">${category.name}</span></a>
+      `;
 
-    // Add event listener to category button
-    filterButton.addEventListener("click", () =>
-      displayWorks(works.filter((work) => work.categoryId == category.id))
-    );
-    categoryButtons.appendChild(filterButton);
+      // Add event listener to category button
+      filterButton.addEventListener("click", () => displayWorks(category.id));
+      categoryButtons.appendChild(filterButton);
+    }
 
     // Add category option to form select
     formSelectCategory.innerHTML += `
@@ -149,6 +169,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
   const openModaleBtn = document.querySelector(".modify");
   const closeModaleBtn = document.querySelector(".close-button");
   const backButton = document.querySelector(".back-button");
+  const modaleAddPhoto = document.querySelector(".modale-addphoto");
+  const modaleGallery = document.querySelector(".modale-gallery");
 
   // Open modal
   openModaleBtn.addEventListener("click", (e) => {
@@ -168,10 +190,19 @@ document.addEventListener("DOMContentLoaded", (event) => {
       modale.classList.add("hidden");
     }
   });
+  // Back-button
+  backButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.querySelector(".modale-addphoto").classList.add("hidden");
+    document.querySelector(".back-button").classList.add("hidden");
+    document.querySelector(".modale-main").classList.remove("hidden");
+    console.log("Retour à la galerie.");
+  });
 
   // Switch to add photo modal
   document.querySelector(".add-button").addEventListener("click", function () {
     document.querySelector(".modale-addphoto").classList.remove("hidden");
+    document.querySelector(".back-button").classList.remove("hidden");
     document.querySelector(".modale-main").classList.add("hidden");
   });
 
@@ -185,6 +216,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
       document.querySelector(".image-unselected").classList.add("hidden");
       document.querySelector(".image-selected").src = URL.createObjectURL(file);
       document.querySelector(".image-selected").classList.remove("hidden");
+      document
+        .querySelector(".modale-modify .validate-button")
+        .classList.remove("disabled");
     });
 
   // Handle add photo form submission
@@ -203,7 +237,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         const response = await fetch("http://localhost:5678/api/works", {
           method: "POST",
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("authToken"),
+            Authorization: "Bearer " + authToken,
             accept: "application/json",
           },
           body: formData,
@@ -287,7 +321,7 @@ async function deleteImage(id) {
   const response = await fetch(`http://localhost:5678/api/works/${id}`, {
     method: "DELETE",
     headers: {
-      Authorization: "Bearer " + localStorage.getItem("authToken"),
+      Authorization: "Bearer " + authToken,
       accept: "application/json",
     },
   });
@@ -303,4 +337,4 @@ async function deleteImage(id) {
 
 // Initialize display functions
 displayWorks();
-displayCategories(globalWorks);
+displayCategories();
