@@ -34,17 +34,5 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Error:", error);
         alert("Une erreur est survenue. Veuillez réessayer.");
       });
-
-    // Simuler les informations d'identification correctes
-    //const correctEmail = "sophie.bluel@test.tld";
-    //const correctPassword = "S0phie";
-
-    // if (email === correctEmail && password === correctPassword) {
-    //   //window.location.href = "index.html"; // Redirige vers la page d'accueil
-    // } else {
-    //   alert(
-    //     "Les informations d'identification sont incorrectes. Veuillez réessayer."
-    //   );
-    // }
   });
 });
