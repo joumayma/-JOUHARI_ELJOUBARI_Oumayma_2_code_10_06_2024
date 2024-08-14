@@ -17,6 +17,23 @@ if (authToken) {
   });
 } else loginLink.innerHTML = '<a href="login.html">login</a>';
 
+//Page Edit Mode
+if (authToken) {
+  var editHeader = document.createElement("div");
+  editHeader.className = "edit";
+  editHeader.innerHTML = `<div class="edit-mode">
+        <img src="assets/icons/modify-white.png" alt="Modifier">
+        <p>Mode édition</p>
+      </div>`;
+  document.body.insertBefore(editHeader, document.body.firstChild);
+  document
+    .querySelector(".title-portfolio")
+    .insertAdjacentHTML(
+      "beforeend",
+      `<a class="modify" href="#"><img src="assets/icons/modify.png" alt="Modifier"> modifier</a>`
+    );
+}
+
 // Function to fetch works
 async function fetchWorks() {
   try {
@@ -247,6 +264,23 @@ document.addEventListener("DOMContentLoaded", (event) => {
           const storedImage = await response.json();
           console.log("store ok", storedImage);
           displayWorks();
+
+          // clear form
+          this.reset();
+
+          // Reset modify modal
+          document.querySelector(".modale").classList.add("hidden");
+          document.querySelector(".modale-addphoto").classList.add("hidden");
+          document.querySelector(".back-button").classList.add("hidden");
+          document.querySelector(".modale-main").classList.remove("hidden");
+          document.querySelector(".image-selected").classList.add("hidden");
+          document
+            .querySelector(".image-unselected")
+            .classList.remove("hidden");
+
+          document
+            .querySelector(".modale-modify .validate-button")
+            .classList.add("disabled");
         } else {
           console.log("store ko", file);
           console.log(response);
