@@ -134,6 +134,9 @@ nav li {
 	padding: 0 10px;
 	font-size: 1.2em;
 }
+li:hover a {
+	color: #B1663C;
+}
 
 li:hover {
 	color: #B1663C;
