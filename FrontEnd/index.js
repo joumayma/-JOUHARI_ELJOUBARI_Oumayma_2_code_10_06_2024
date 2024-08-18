@@ -180,117 +180,125 @@ async function displayCategories(works) {
   });
 }
 
-// Add event listeners for modal actions
-document.addEventListener("DOMContentLoaded", (event) => {
-  const modale = document.querySelector(".modale");
-  const openModaleBtn = document.querySelector(".modify");
-  const closeModaleBtn = document.querySelector(".close-button");
-  const backButton = document.querySelector(".back-button");
-  const modaleAddPhoto = document.querySelector(".modale-addphoto");
-  const modaleGallery = document.querySelector(".modale-gallery");
+if (authToken) {
+  // Add event listeners for modal actions
+  document.addEventListener("DOMContentLoaded", (event) => {
+    const modale = document.querySelector(".modale");
+    const openModaleBtn = document.querySelector(".modify");
+    const closeModaleBtn = document.querySelector(".close-button");
+    const backButton = document.querySelector(".back-button");
+    const modaleAddPhoto = document.querySelector(".modale-addphoto");
+    const modaleGallery = document.querySelector(".modale-gallery");
 
-  // Open modal
-  openModaleBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    modale.classList.remove("hidden");
-  });
-
-  // Close modal
-  closeModaleBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    modale.classList.add("hidden");
-  });
-
-  // Close modal by clicking outside
-  window.addEventListener("click", (e) => {
-    if (e.target === modale) {
-      modale.classList.add("hidden");
-    }
-  });
-  // Back-button
-  backButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    document.querySelector(".modale-addphoto").classList.add("hidden");
-    document.querySelector(".back-button").classList.add("hidden");
-    document.querySelector(".modale-main").classList.remove("hidden");
-    console.log("Retour à la galerie.");
-  });
-
-  // Switch to add photo modal
-  document.querySelector(".add-button").addEventListener("click", function () {
-    document.querySelector(".modale-addphoto").classList.remove("hidden");
-    document.querySelector(".back-button").classList.remove("hidden");
-    document.querySelector(".modale-main").classList.add("hidden");
-  });
-
-  let file = null;
-
-  // Handle image file selection
-  document
-    .getElementById("image")
-    .addEventListener("change", async function (event) {
-      file = event.target.files[0];
-      document.querySelector(".image-unselected").classList.add("hidden");
-      document.querySelector(".image-selected").src = URL.createObjectURL(file);
-      document.querySelector(".image-selected").classList.remove("hidden");
-      document
-        .querySelector(".modale-modify .validate-button")
-        .classList.remove("disabled");
+    // Open modal
+    openModaleBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      modale.classList.remove("hidden");
     });
 
-  // Handle add photo form submission
-  document
-    .getElementById("addphoto-form")
-    .addEventListener("submit", async function (event) {
-      event.preventDefault();
+    // Close modal
+    closeModaleBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      modale.classList.add("hidden");
+    });
 
-      if (file) {
-        const formData = new FormData();
-        formData.append("image", file);
-        formData.append("title", document.getElementById("title").value);
-        formData.append("category", document.getElementById("category").value);
-        console.log("Bearer " + localStorage.getItem("authToken"));
-
-        const response = await fetch("http://localhost:5678/api/works", {
-          method: "POST",
-          headers: {
-            Authorization: "Bearer " + authToken,
-            accept: "application/json",
-          },
-          body: formData,
-        });
-
-        if (response.ok) {
-          const storedImage = await response.json();
-          console.log("store ok", storedImage);
-          displayWorks();
-
-          // clear form
-          this.reset();
-
-          // Reset modify modal
-          document.querySelector(".modale").classList.add("hidden");
-          document.querySelector(".modale-addphoto").classList.add("hidden");
-          document.querySelector(".back-button").classList.add("hidden");
-          document.querySelector(".modale-main").classList.remove("hidden");
-          document.querySelector(".image-selected").classList.add("hidden");
-          document
-            .querySelector(".image-unselected")
-            .classList.remove("hidden");
-
-          document
-            .querySelector(".modale-modify .validate-button")
-            .classList.add("disabled");
-        } else {
-          console.log("store ko", file);
-          console.log(response);
-        }
-      } else {
-        document.getElementById("file-info").innerHTML =
-          "Aucun fichier sélectionné.";
+    // Close modal by clicking outside
+    window.addEventListener("click", (e) => {
+      if (e.target === modale) {
+        modale.classList.add("hidden");
       }
     });
-});
+    // Back-button
+    backButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.querySelector(".modale-addphoto").classList.add("hidden");
+      document.querySelector(".back-button").classList.add("hidden");
+      document.querySelector(".modale-main").classList.remove("hidden");
+      console.log("Retour à la galerie.");
+    });
+
+    // Switch to add photo modal
+    document
+      .querySelector(".add-button")
+      .addEventListener("click", function () {
+        document.querySelector(".modale-addphoto").classList.remove("hidden");
+        document.querySelector(".back-button").classList.remove("hidden");
+        document.querySelector(".modale-main").classList.add("hidden");
+      });
+
+    let file = null;
+
+    // Handle image file selection
+    document
+      .getElementById("image")
+      .addEventListener("change", async function (event) {
+        file = event.target.files[0];
+        document.querySelector(".image-unselected").classList.add("hidden");
+        document.querySelector(".image-selected").src =
+          URL.createObjectURL(file);
+        document.querySelector(".image-selected").classList.remove("hidden");
+        document
+          .querySelector(".modale-modify .validate-button")
+          .classList.remove("disabled");
+      });
+
+    // Handle add photo form submission
+    document
+      .getElementById("addphoto-form")
+      .addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        if (file) {
+          const formData = new FormData();
+          formData.append("image", file);
+          formData.append("title", document.getElementById("title").value);
+          formData.append(
+            "category",
+            document.getElementById("category").value
+          );
+          console.log("Bearer " + localStorage.getItem("authToken"));
+
+          const response = await fetch("http://localhost:5678/api/works", {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + authToken,
+              accept: "application/json",
+            },
+            body: formData,
+          });
+
+          if (response.ok) {
+            const storedImage = await response.json();
+            console.log("store ok", storedImage);
+            displayWorks();
+
+            // clear form
+            this.reset();
+
+            // Reset modify modal
+            document.querySelector(".modale").classList.add("hidden");
+            document.querySelector(".modale-addphoto").classList.add("hidden");
+            document.querySelector(".back-button").classList.add("hidden");
+            document.querySelector(".modale-main").classList.remove("hidden");
+            document.querySelector(".image-selected").classList.add("hidden");
+            document
+              .querySelector(".image-unselected")
+              .classList.remove("hidden");
+
+            document
+              .querySelector(".modale-modify .validate-button")
+              .classList.add("disabled");
+          } else {
+            console.log("store ko", file);
+            console.log(response);
+          }
+        } else {
+          document.getElementById("file-info").innerHTML =
+            "Aucun fichier sélectionné.";
+        }
+      });
+  });
+}
 
 // Function to display works in modal
 function displayWorksModale() {
